@@ -1,7 +1,7 @@
 pandas
 numpy
 scikit-learn
+imbalanced-learn
 matplotlib
 seaborn
-joblib
-imbalanced-learn
+torch
