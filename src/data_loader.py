@@ -1,26 +1,29 @@
+from pathlib import Path
 import pandas as pd
-from config import RAW_DATA_PATH
 
 
-def load_data(path=RAW_DATA_PATH):
+def load_data(filename="diabetic_data.csv"):
     """
-    Load the raw UCI Diabetes hospital readmission dataset.
+    Load the diabetes readmission dataset.
 
-    The dataset should be stored at:
-    data/raw/diabetic_data.csv
+    Looks for the file in common project data locations and raises a clear
+    error if the file is missing.
     """
-    try:
-        df = pd.read_csv(path)
-        print(f"Loaded dataset with shape: {df.shape}")
-        return df
-    except FileNotFoundError:
-        raise FileNotFoundError(
-            f"Dataset not found at {path}. "
-            "Place diabetic_data.csv inside data/raw/ before running."
-        )
+    project_root = Path(__file__).resolve().parent.parent
 
+    candidate_paths = [
+        project_root / "data" / "raw" / filename,
+        project_root / "data" / filename,
+        project_root / filename,
+    ]
 
-if __name__ == "__main__":
-    df = load_data()
-    print(df.head())
-    print(df.info())
+    for path in candidate_paths:
+        if path.exists():
+            print(f"Loading data from: {path}")
+            return pd.read_csv(path)
+
+    searched = "\n".join(str(p) for p in candidate_paths)
+    raise FileNotFoundError(
+        f"Could not find {filename}. Checked these locations:\n{searched}\n\n"
+        "Please place the dataset in one of those locations."
+    )
